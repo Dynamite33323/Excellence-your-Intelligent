@@ -1,0 +1,639 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>First Read</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<style>
+:root {
+  /* Layout: one left-aligned column. The sentence sits in a bordered reading window with a drain bar along its lower edge. */
+  --bg: #E9EEEC;
+  --surface: #F6F9F8;
+  --fg: #12201C;
+  --muted: #53655F;
+  --line: #C5D1CC;
+  --accent: #1F5FBF;
+  --accent-fg: #FFFFFF;
+  --good: #17804A;
+  --good-bg: #DDF1E6;
+  --bad: #B42318;
+  --bad-bg: #FADDD8;
+  --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1715;
+    --surface: #17211E;
+    --fg: #E6EEEA;
+    --muted: #93A8A0;
+    --line: #2A3935;
+    --accent: #6EA8FF;
+    --accent-fg: #0B1220;
+    --good: #4CC38A;
+    --good-bg: #123325;
+    --bad: #FF8A7A;
+    --bad-bg: #3A1914;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1715;
+  --surface: #17211E;
+  --fg: #E6EEEA;
+  --muted: #93A8A0;
+  --line: #2A3935;
+  --accent: #6EA8FF;
+  --accent-fg: #0B1220;
+  --good: #4CC38A;
+  --good-bg: #123325;
+  --bad: #FF8A7A;
+  --bad-bg: #3A1914;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-inline: 16px;
+  padding-block: 28px 56px;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.wrap { max-width: 44rem; margin-inline: auto; display: grid; gap: 1.5rem; }
+.top { display: grid; gap: 0.25rem; }
+h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 2.4rem;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0;
+  text-wrap: balance;
+}
+.sub { margin: 0; color: var(--muted); max-width: 36rem; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1.25rem;
+  display: grid;
+  gap: 1.25rem;
+}
+h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.5rem;
+  margin: 0;
+  line-height: 1.2;
+}
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 0.5rem; }
+legend, .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 0;
+  margin: 0;
+}
+.seg { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.seg label { position: relative; }
+.seg input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.seg span {
+  display: block;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+  font-weight: 500;
+}
+.seg input:checked + span {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+.steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.35rem; counter-reset: s; }
+.steps li { display: flex; gap: 0.75rem; align-items: baseline; }
+.steps li::before {
+  counter-increment: s;
+  content: counter(s);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  min-width: 1rem;
+}
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-fg);
+  padding: 0.75rem 1.4rem;
+  cursor: pointer;
+  justify-self: start;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--accent); filter: none; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.status .eyebrow { color: var(--fg); }
+.dots { display: flex; gap: 0.4rem; }
+.dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+}
+.dot.ok { background: var(--good); border-color: var(--good); }
+.dot.miss { background: var(--bad); border-color: var(--bad); }
+.dot.now { border-color: var(--accent); }
+
+.stage {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 15rem;
+}
+.stage-body {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+.stage-body p { margin: 0; }
+.row { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+.timer { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 500; }
+.sentence {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 4vw, 1.85rem);
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+.lead { font-size: 1.05rem; max-width: 34rem; }
+.question {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.replay {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.verdict { font-weight: 600; }
+.verdict.good { color: var(--good); }
+.verdict.bad { color: var(--bad); }
+.meter { height: 6px; background: var(--line); }
+.meter-fill { height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left center; }
+
+.controls { display: grid; gap: 0.6rem; }
+.hint { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.opt {
+  font: inherit;
+  text-align: left;
+  display: flex;
+  gap: 0.8rem;
+  align-items: baseline;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+  min-width: 0;
+}
+.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt:disabled { cursor: default; }
+.opt .key { font-family: var(--font-mono); color: var(--muted); font-size: 0.85rem; }
+.opt .txt { flex: 1; min-width: 0; overflow-wrap: break-word; }
+.opt .tag { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.opt.right { background: var(--good-bg); border-color: var(--good); }
+.opt.right .tag { color: var(--good); }
+.opt.wrong { background: var(--bad-bg); border-color: var(--bad); }
+.opt.wrong .tag { color: var(--bad); }
+
+.score {
+  font-family: var(--font-display);
+  font-size: 3.6rem;
+  line-height: 1;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.score small { font-size: 1.4rem; color: var(--muted); }
+.stats { margin: 0; display: grid; }
+.stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.stat dt { color: var(--muted); }
+.stat dd { margin: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+.advice { margin: 0; max-width: 36rem; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main class="wrap">
+  <header class="top">
+    <h1>First Read</h1>
+    <p class="sub">One sentence, one look, no replay. Understand it the first time, then answer a question from memory.</p>
+  </header>
+
+  <section id="setup" class="panel" aria-labelledby="setupTitle">
+    <h2 id="setupTitle">Pick your setup</h2>
+
+    <fieldset>
+      <legend>Sentence level</legend>
+      <div class="seg">
+        <label><input type="radio" name="level" id="lv-easy" value="easy" checked><span>Easy</span></label>
+        <label><input type="radio" name="level" id="lv-medium" value="medium"><span>Medium</span></label>
+        <label><input type="radio" name="level" id="lv-hard" value="hard"><span>Hard</span></label>
+        <label><input type="radio" name="level" id="lv-mixed" value="mixed"><span>Mixed</span></label>
+      </div>
+      <p class="note" id="levelNote"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Time to read</legend>
+      <div class="seg">
+        <label><input type="radio" name="time" id="t-4" value="4"><span>4 s</span></label>
+        <label><input type="radio" name="time" id="t-5" value="5" checked><span>5 s</span></label>
+        <label><input type="radio" name="time" id="t-6" value="6"><span>6 s</span></label>
+        <label><input type="radio" name="time" id="t-8" value="8"><span>8 s</span></label>
+        <label><input type="radio" name="time" id="t-10" value="10"><span>10 s</span></label>
+      </div>
+      <p class="note" id="bestNote"></p>
+    </fieldset>
+
+    <ol class="steps">
+      <li>A sentence appears for your chosen time.</li>
+      <li>It disappears. You cannot bring it back.</li>
+      <li>You answer one question about it, from memory.</li>
+    </ol>
+
+    <button type="button" class="btn" id="startBtn">Start 10 rounds</button>
+  </section>
+
+  <section id="game" hidden aria-label="Game">
+    <div class="wrap" style="gap:1rem">
+      <div class="status">
+        <span class="eyebrow" id="roundLabel"></span>
+        <div class="dots" id="dots" aria-hidden="true"></div>
+        <span class="eyebrow" id="scoreLabel"></span>
+      </div>
+      <div class="stage" id="stage">
+        <div class="stage-body" id="stageBody" aria-live="polite"></div>
+        <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+      </div>
+      <div class="controls" id="controls"></div>
+    </div>
+  </section>
+
+  <section id="summary" class="panel" hidden aria-labelledby="sumTitle">
+    <h2 id="sumTitle">Session result</h2>
+    <p class="score"><span id="sumScore"></span><small> / 10</small></p>
+    <dl class="stats" id="sumStats"></dl>
+    <p class="advice" id="sumAdvice"></p>
+    <div class="btn-row">
+      <button type="button" class="btn" id="againBtn">Play again</button>
+      <button type="button" class="btn ghost" id="settingsBtn">Change setup</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var BANK = {
+    easy: [
+      { s: "Rohan missed the morning train, so he reached the office by taxi.", q: "How did Rohan reach the office?", a: "By taxi", w: ["By train", "On foot", "By bus"] },
+      { s: "The shop closes at nine on weekdays but at six on Sundays.", q: "When does the shop close on Sundays?", a: "At six", w: ["At nine", "At five", "At eight"] },
+      { s: "Meera put the keys in her bag before leaving for the market.", q: "Where did Meera put the keys?", a: "In her bag", w: ["On the table", "In her pocket", "At the market"] },
+      { s: "Our flight was delayed by two hours because of heavy fog.", q: "Why was the flight delayed?", a: "Heavy fog", w: ["A technical fault", "A strike", "A late crew"] },
+      { s: "Anil bought three notebooks and one pen for his sister.", q: "How many notebooks did Anil buy?", a: "Three", w: ["One", "Two", "Four"] },
+      { s: "The meeting was moved from Monday to Thursday afternoon.", q: "When is the meeting now?", a: "Thursday afternoon", w: ["Monday afternoon", "Thursday morning", "Tuesday afternoon"] },
+      { s: "She drinks tea in the morning and coffee only after lunch.", q: "When does she drink coffee?", a: "After lunch", w: ["In the morning", "At night", "Before breakfast"] },
+      { s: "The bus was full, so we waited for the next one.", q: "Why did they wait for the next bus?", a: "The bus was full", w: ["The bus was late", "It was the wrong route", "It started raining"] },
+      { s: "Priya’s brother lives in Delhi and works at a bank.", q: "Where does Priya’s brother work?", a: "At a bank", w: ["At a school", "At a hospital", "At a shop"] },
+      { s: "It rained all night, but the morning was bright and warm.", q: "What was the morning like?", a: "Bright and warm", w: ["Cold and cloudy", "Still rainy", "Foggy"] },
+      { s: "Dad cooked dinner while we cleaned the living room.", q: "Who cooked dinner?", a: "Dad", w: ["Mom", "An uncle", "A hired cook"] },
+      { s: "The train to Mumbai leaves from platform four at seven.", q: "Which platform does the train leave from?", a: "Platform four", w: ["Platform seven", "Platform two", "Platform nine"] }
+    ],
+    medium: [
+      { s: "Although the new app was faster than the old one, most customers kept using the old version because it felt familiar.", q: "Why did most customers keep the old version?", a: "It felt familiar", w: ["It was faster", "It was cheaper", "The new app crashed"] },
+      { s: "The manager did not reject the proposal; he asked the team to bring cost estimates before the final decision.", q: "What did the manager ask for?", a: "Cost estimates", w: ["A shorter proposal", "A new team", "A final decision today"] },
+      { s: "Neha finished her report two days early, yet she waited until Friday to send it so it would not look rushed.", q: "Why did Neha wait to send the report?", a: "So it would not look rushed", w: ["She had not finished it", "Her manager was away", "She forgot about it"] },
+      { s: "Only the first ten customers will receive the free sample, and each customer may take just one.", q: "How many samples may each customer take?", a: "One", w: ["Ten", "Two", "As many as they like"] },
+      { s: "Because the server crashed at midnight, the update, which was planned for morning, had to be postponed to next week.", q: "When is the update now planned?", a: "Next week", w: ["This morning", "Tomorrow", "At midnight"] },
+      { s: "Ravi thought the exam would be easy, but after reading the first question he realised he had studied the wrong chapter.", q: "What did Ravi realise?", a: "He had studied the wrong chapter", w: ["The exam was easy", "He was in the wrong room", "He had forgotten his pen"] },
+      { s: "The company’s profit fell by ten percent this year, mainly because the cost of raw material rose sharply.", q: "What was the main reason profit fell?", a: "Raw material cost rose", w: ["Fewer customers", "Higher salaries", "A new tax"] },
+      { s: "Unless the rain stops by noon, the cricket match will be played on Sunday instead of Saturday.", q: "If the rain does not stop by noon, when is the match?", a: "Sunday", w: ["Saturday", "At noon", "It is cancelled"] },
+      { s: "Meena’s brother is older than her, but her cousin, who is the youngest of the three, already earns a salary.", q: "Who is the youngest of the three?", a: "Meena’s cousin", w: ["Meena’s brother", "Meena herself", "It cannot be known"] },
+      { s: "The doctor said he could drink tea, but only without sugar and no more than two cups a day.", q: "How many cups of tea a day may he drink?", a: "No more than two", w: ["Only one", "As many as he likes", "None at all"] },
+      { s: "Instead of hiring more staff, the shop owner extended the opening hours by two hours every evening.", q: "What did the owner do instead of hiring staff?", a: "Extended the opening hours", w: ["Raised the prices", "Closed one day a week", "Cut the opening hours"] },
+      { s: "Tickets booked before the fifteenth get a twenty percent discount; after that, the discount drops to ten.", q: "What discount applies to a ticket booked on the twentieth?", a: "Ten percent", w: ["Twenty percent", "No discount", "Fifteen percent"] }
+    ],
+    hard: [
+      { s: "The project, which was originally due in March, was delayed twice, first by a change in client requirements and later by the departure of the lead developer.", q: "What caused the second delay?", a: "The lead developer left", w: ["A change in client requirements", "A budget cut", "A server failure"] },
+      { s: "Though critics praised the film’s cinematography, audiences stayed away, which the director blamed on poor marketing rather than on the story itself.", q: "What did the director blame for the low turnout?", a: "Poor marketing", w: ["The story", "The critics", "The cinematography"] },
+      { s: "If the shipment arrives before Wednesday, we will start production on Thursday; otherwise, production begins the following Monday, and the client will be informed.", q: "The shipment arrives on Thursday. When does production start?", a: "The following Monday", w: ["That Thursday", "On Wednesday", "The following Friday"] },
+      { s: "Asha earns more than Karan but less than Deepak, and Vikram, who joined last year, earns less than Karan.", q: "Who earns the second most?", a: "Asha", w: ["Deepak", "Karan", "Vikram"] },
+      { s: "The study found that students who slept eight hours scored higher than those who studied late, even though the late-night group had spent more time revising.", q: "Which group scored higher?", a: "Those who slept eight hours", w: ["The late-night group", "Both scored the same", "The study does not say"] },
+      { s: "Not once during the three-hour negotiation did the supplier agree to lower the price, though he did offer faster delivery as a compromise.", q: "What did the supplier offer?", a: "Faster delivery", w: ["A lower price", "A free sample", "A longer contract"] },
+      { s: "The new policy, announced on Monday and effective from the first of next month, requires every employee to submit travel claims within seven days of returning.", q: "Within how many days must claims be submitted?", a: "Seven", w: ["Thirty", "One", "Fourteen"] },
+      { s: "Having failed to convince the board, the founder, instead of abandoning the idea, decided to test it quietly with ten customers first.", q: "What did the founder do after failing to convince the board?", a: "Tested the idea with ten customers", w: ["Abandoned the idea", "Convinced the board later that day", "Hired a new team"] },
+      { s: "Prices in the region rose faster than wages last year, so although people earned more in rupees, they could actually buy less than before.", q: "What happened to what people could buy?", a: "They could buy less", w: ["They could buy more", "It stayed the same", "Wages fell in rupees"] },
+      { s: "Neither the sales team nor the design team knew about the launch date, which had been shared only with the finance department and the CEO.", q: "Who knew the launch date?", a: "Finance and the CEO", w: ["Sales and design", "Everyone in the company", "Only the CEO"] },
+      { s: "The courier promised delivery in two days, but because of a holiday in between, the parcel, which was shipped Tuesday, finally arrived the following Monday.", q: "On which day was the parcel shipped?", a: "Tuesday", w: ["Monday", "Wednesday", "Sunday"] },
+      { s: "Despite being the cheaper option, the second plan was rejected because it needed twice as many people and took a month longer than the first.", q: "Why was the second plan rejected?", a: "It needed more people and more time", w: ["It was more expensive", "It was less safe", "It had been tried before"] }
+    ]
+  };
+
+  var LEVELS = {
+    easy: { label: "Easy", note: "9 to 12 words. One clear fact." },
+    medium: { label: "Medium", note: "16 to 21 words. A contrast, a condition or a number to keep straight." },
+    hard: { label: "Hard", note: "18 to 28 words. Two or three facts, and the answer depends on how they connect." },
+    mixed: { label: "Mixed", note: "Three easy, four medium and three hard sentences in random order." }
+  };
+  var ROUNDS = 10;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var body = $("stageBody"), controls = $("controls"), fill = $("meterFill");
+  var state = { level: "easy", time: 5, items: [], i: 0, results: [], phase: "setup", raf: 0, t0: 0, qShown: 0, timerEl: null };
+
+  function h(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function put(parent) {
+    var kids = Array.prototype.slice.call(arguments, 1).filter(Boolean);
+    parent.replaceChildren.apply(parent, kids);
+  }
+  function setMeter(p) { fill.style.transform = "scaleX(" + Math.max(0, Math.min(1, p)) + ")"; }
+  function storeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function storeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function bestKey() { return "firstread:" + state.level + ":" + state.time; }
+  function shuffle(a) {
+    var b = a.slice();
+    for (var i = b.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = b[i]; b[i] = b[j]; b[j] = t;
+    }
+    return b;
+  }
+  function tag(list, lv) { return list.map(function (x) { return Object.assign({}, x, { lv: lv }); }); }
+
+  function build(level) {
+    var pool;
+    if (level === "mixed") {
+      pool = shuffle([].concat(
+        tag(shuffle(BANK.easy).slice(0, 3), "easy"),
+        tag(shuffle(BANK.medium).slice(0, 4), "medium"),
+        tag(shuffle(BANK.hard).slice(0, 3), "hard")
+      ));
+    } else {
+      pool = tag(shuffle(BANK[level]).slice(0, ROUNDS), level);
+    }
+    return pool.map(function (x) {
+      var opts = shuffle([x.a].concat(x.w));
+      return Object.assign({}, x, { opts: opts, ci: opts.indexOf(x.a) });
+    });
+  }
+
+  function readSetup() {
+    state.level = document.querySelector("input[name=level]:checked").value;
+    state.time = Number(document.querySelector("input[name=time]:checked").value);
+  }
+  function updateSetupNotes() {
+    readSetup();
+    $("levelNote").textContent = LEVELS[state.level].note;
+    var best = storeGet(bestKey());
+    $("bestNote").textContent = best !== null ? "Your best at this setting: " + best + " of " + ROUNDS + "." : "No score yet at this setting.";
+  }
+
+  function cur() { return state.items[state.i]; }
+
+  function renderStatus() {
+    $("roundLabel").textContent = "Round " + (state.i + 1) + " of " + ROUNDS;
+    var correct = state.results.filter(function (r) { return r.ok; }).length;
+    $("scoreLabel").textContent = "Correct: " + correct;
+    var dots = $("dots");
+    dots.replaceChildren();
+    for (var k = 0; k < ROUNDS; k++) {
+      var d = h("span", "dot");
+      if (state.results[k]) d.className += state.results[k].ok ? " ok" : " miss";
+      else if (k === state.i) d.className += " now";
+      dots.appendChild(d);
+    }
+  }
+
+  function startGame() {
+    readSetup();
+    state.items = build(state.level);
+    state.i = 0;
+    state.results = [];
+    $("setup").hidden = true;
+    $("summary").hidden = true;
+    $("game").hidden = false;
+    renderStatus();
+    showReady();
+  }
+
+  function showReady(msg) {
+    cancelAnimationFrame(state.raf);
+    state.phase = "ready";
+    setMeter(0);
+    put(body,
+      h("p", "eyebrow", "Round " + (state.i + 1)),
+      h("p", "lead", "The sentence stays for " + state.time + " seconds, then it disappears. You cannot bring it back."),
+      msg ? h("p", "note", msg) : null
+    );
+    var b = h("button", "btn", "Show sentence");
+    b.type = "button";
+    b.addEventListener("click", startFlash);
+    put(controls, b);
+    b.focus({ preventScroll: true });
+  }
+
+  function startFlash() {
+    state.phase = "flash";
+    var timer = h("span", "timer", state.time.toFixed(1) + " s");
+    state.timerEl = timer;
+    var row = h("div", "row");
+    row.append(h("span", "eyebrow", "Read once"), timer);
+    put(body, row, h("p", "sentence", cur().s));
+    put(controls, h("p", "hint", "Read in phrases of three or four words. Do not go back."));
+    state.t0 = performance.now();
+    setMeter(1);
+    state.raf = requestAnimationFrame(tick);
+  }
+
+  function tick(now) {
+    var total = state.time * 1000;
+    var left = Math.max(0, total - (now - state.t0));
+    setMeter(left / total);
+    state.timerEl.textContent = (left / 1000).toFixed(1) + " s";
+    if (left <= 0) { showQuestion(); return; }
+    state.raf = requestAnimationFrame(tick);
+  }
+
+  function showQuestion() {
+    state.phase = "question";
+    setMeter(0);
+    var it = cur();
+    put(body, h("p", "eyebrow", "Question, answer from memory"), h("p", "question", it.q));
+    var list = h("div", "controls");
+    it.opts.forEach(function (o, k) {
+      var b = h("button", "opt");
+      b.type = "button";
+      b.append(h("span", "key", String(k + 1)), h("span", "txt", o));
+      b.addEventListener("click", function () { answer(k); });
+      list.appendChild(b);
+    });
+    put(controls, list);
+    state.qShown = performance.now();
+  }
+
+  function answer(k) {
+    if (state.phase !== "question") return;
+    var it = cur();
+    var ok = k === it.ci;
+    state.results.push({ ok: ok, ms: performance.now() - state.qShown, lv: it.lv });
+    showFeedback(k, ok);
+  }
+
+  function showFeedback(chosen, ok) {
+    state.phase = "feedback";
+    var it = cur();
+    renderStatus();
+    put(body,
+      h("p", "verdict " + (ok ? "good" : "bad"), ok ? "Correct" : "Missed"),
+      h("p", "eyebrow", "The sentence, now you can read it freely"),
+      h("p", "replay", it.s)
+    );
+    var list = h("div", "controls");
+    it.opts.forEach(function (o, k) {
+      var b = h("button", "opt");
+      b.type = "button";
+      b.disabled = true;
+      b.append(h("span", "key", String(k + 1)), h("span", "txt", o));
+      if (k === it.ci) { b.className += " right"; b.append(h("span", "tag", "Correct")); }
+      else if (k === chosen) { b.className += " wrong"; b.append(h("span", "tag", "Your answer")); }
+      list.appendChild(b);
+    });
+    var last = state.i === ROUNDS - 1;
+    var next = h("button", "btn", last ? "See results" : "Next sentence");
+    next.type = "button";
+    next.addEventListener("click", function () {
+      if (last) { showSummary(); return; }
+      state.i++;
+      renderStatus();
+      showReady();
+    });
+    put(controls, list, next);
+    next.focus({ preventScroll: true });
+  }
+
+  function showSummary() {
+    state.phase = "summary";
+    $("game").hidden = true;
+    $("summary").hidden = false;
+    var res = state.results;
+    var score = res.filter(function (r) { return r.ok; }).length;
+    var avg = res.reduce(function (a, r) { return a + r.ms; }, 0) / res.length / 1000;
+    $("sumScore").textContent = String(score);
+
+    var prev = storeGet(bestKey());
+    var isBest = prev === null || score > Number(prev);
+    if (isBest) storeSet(bestKey(), String(score));
+
+    var stats = $("sumStats");
+    stats.replaceChildren();
+    function addStat(k, v) {
+      var d = h("div", "stat");
+      d.append(h("dt", null, k), h("dd", null, v));
+      stats.appendChild(d);
+    }
+    addStat("Setting", LEVELS[state.level].label + ", " + state.time + " seconds");
+    addStat("Accuracy", Math.round(score / res.length * 100) + "%");
+    addStat("Average time to answer", avg.toFixed(1) + " s");
+    if (state.level === "mixed") {
+      ["easy", "medium", "hard"].forEach(function (lv) {
+        var set = res.filter(function (r) { return r.lv === lv; });
+        if (set.length) addStat(LEVELS[lv].label + " sentences", set.filter(function (r) { return r.ok; }).length + " of " + set.length);
+      });
+    }
+    addStat("Best at this setting", (isBest ? score : prev) + " of " + ROUNDS + (isBest && prev !== null ? " (new best)" : ""));
+
+    var advice;
+    if (score >= 9) advice = "Strong first reads. Make it harder next time: cut one second, or move up a level.";
+    else if (score >= 7) advice = "Good. Stay on this setting until you score 9 or more, then make it harder.";
+    else if (score >= 4) advice = "Keep this setting for now. Read in phrases of three or four words and say the main point to yourself before the sentence disappears.";
+    else advice = "Add two seconds or drop a level. The aim is to build the habit of getting it right on the first look, so start where you can win.";
+    $("sumAdvice").textContent = advice;
+    $("againBtn").focus({ preventScroll: true });
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden && state.phase === "flash") {
+      showReady("The sentence was hidden because you left the page. Press Show sentence when you are back.");
+    }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (state.phase === "question" && /^[1-4]$/.test(e.key) && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      answer(Number(e.key) - 1);
+    }
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll("input[name=level], input[name=time]"), function (el) {
+    el.addEventListener("change", updateSetupNotes);
+  });
+  $("startBtn").addEventListener("click", startGame);
+  $("againBtn").addEventListener("click", startGame);
+  $("settingsBtn").addEventListener("click", function () {
+    $("summary").hidden = true;
+    $("game").hidden = true;
+    $("setup").hidden = false;
+    state.phase = "setup";
+    updateSetupNotes();
+  });
+
+  updateSetupNotes();
+})();
+</script>
+
+</body></html>
